@@ -9,9 +9,12 @@ print('Hey, code got to here just fine!')
 print(var)
 # Expected output:
 # Havířov
+
 # Actual output:
 # File "4_test_analysis.py", line 9, in <module>
 #    print(var)
 #  File "D:\Anaconda\envs\PythonData\lib\encodings\cp1252.py", line 19, in encode
 #    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
 # UnicodeEncodeError: 'charmap' codec can't encode character '\u0159' in position 4: character maps to <undefined>
+
+# Note that this exact code works on some people's computers, but not mine (Daniel's)??

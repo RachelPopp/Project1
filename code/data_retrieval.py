@@ -11,6 +11,8 @@ import hdf5_getters as hg
 # code to save our dataframe to csv
 from save_df import save
 
+import analysis
+
 # the above steps take a little while, so whether debug or not, print
 print("Done importing")
 
@@ -32,7 +34,10 @@ hg_methods_dict = {
     "Title":hg.get_title,
     "Release":hg.get_release,
     "Year":hg.get_year,
-    "Danceability":hg.get_danceability
+    "Danceability":hg.get_danceability,
+    "Energy":hg.get_energy,
+    "Mode":hg.get_mode,
+    "Tempo":hg.get_tempo
     }
 
 # Initializing datatypes & counters we'll need later
@@ -90,12 +95,11 @@ for subdir, dirs, files in os.walk(os.path.join('..','MillionSongSubset','data')
 # new line after the progressbar
 print()
 
-# Determining type of each received data by looking at row 1
-if DEBUG:
-    for x in df_songs.iloc[1] : print(f"-- type of ({x}) is type: {type(x)}")
-
 # Just checking how big the filesize gets
 if DEBUG : print(f"-- sys.getsizeof(df_songs) [size in bytes]: {sys.getsizeof(df_songs)}")
 
 # Printing dataframe to csv via the save_df.py method, unless larger than 100mb; if we get a hellabig frame, we ought to split it up. 
 if sys.getsizeof(df_songs) < (100000000): save(df_songs)
+
+# One option to handle passing dataframes to different location
+analysis.clean_columns(df_songs, DEBUG)
