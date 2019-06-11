@@ -3,6 +3,7 @@ variable = b'Hav\xc3\xad\xc5\x99ov'
 
 # and then we know how to decode it into a unicode character, this part works just fine
 var = variable.decode('UTF-8')
+
 print('Hey, code got to here just fine!')
 
 # But trying to print it... dies
