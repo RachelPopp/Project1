@@ -15,10 +15,10 @@ import analysis
 
 # the above steps take a little while, so whether debug or not, print
 print("Done importing")
-
+print("Rachel's Check")
 
 # Debug section; either True or False (1 or 0)
-DEBUG = True
+DEBUG = False
 test_length = 10
 if DEBUG : print(f'-- DEBUG MODE ON')
 
