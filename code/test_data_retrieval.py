@@ -30,7 +30,9 @@ hg_methods_dict = {
     "Title":hg.get_title,
     "Release":hg.get_release,
     "Year":hg.get_year,
-    "Danceability":hg.get_danceability
+    "Danceability":hg.get_danceability,
+    "Loudness":hg.get_loudness,
+    "Hotness":hg.get_song_hotttnesss
     }
 
 # Initializing datatypes & counters we'll need later
