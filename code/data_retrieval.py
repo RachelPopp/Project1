@@ -37,7 +37,9 @@ hg_methods_dict = {
     "Danceability":hg.get_danceability,
     "Energy":hg.get_energy,
     "Mode":hg.get_mode,
-    "Tempo":hg.get_tempo
+    "Tempo":hg.get_tempo,
+    "Loudness":hg.get_loudness,
+    "Hotness":hg.get_song_hotttnesss
     }
 
 # Initializing datatypes & counters we'll need later
