@@ -18,7 +18,7 @@ print("Done importing")
 
 # Debug section; either True or False (1 or 0)
 DEBUG = True
-test_length = 100000
+test_length = 100
 if DEBUG : print(f'-- DEBUG MODE ON')
 
 # -----------------------------------
@@ -53,9 +53,7 @@ for subdir, dirs, files in os.walk(os.path.join('..','MillionSongSubset','data')
     for file in files:
 
         # Note, this "progress bar" will only work if there's no other print statements in the loop! Use sys.stdout.write instead of print to avoid newlines, if you want output in main loop
-        sys.stdout.write(f"\x1b[2K\rWorking on file no: {file_no:4d}")
-
-        # if DEBUG : print(f"-- file: {file}")
+        sys.stdout.write(f"\x1b[2K\rWorking on file no: {file_no:6d}")
         
         # open currently selected file (e.g. .../Z/I/TRAAAAW128F429D538.h5)
         hfile = hg.open_h5_file_read(os.path.join(subdir, file))
@@ -78,7 +76,7 @@ for subdir, dirs, files in os.walk(os.path.join('..','MillionSongSubset','data')
                     datum = datum.decode('UTF-8')
                     # note sys.stdout won't actually get printed here due to buffering; sys.stdout.flush after the hg_method loop will display the whole thing
                     sys.stdout.write(f" : {datum}")
-                # if .write gets a unicode error, take a look. If you're on a system that can handle unicode issues, comment out the unicode_valid = False line!
+                # if .write gets a unicode error, take a look.
                 except UnicodeEncodeError:
                     datum = datum.encode('UTF-8')
                     if DEBUG : print(f" : ENCODING ERROR! {datum}")
@@ -89,7 +87,7 @@ for subdir, dirs, files in os.walk(os.path.join('..','MillionSongSubset','data')
             data.append(datum)
         
         # once all methods finished IF UNICODE IS VALID, append row to dataframe, and print if debug show what was appended
-        if unicode_valid : df_songs = df_songs.append(pd.Series(data, index=df_songs.columns), ignore_index=True)
+        if unicode_valid : df_songs = df_songs.append(pd.Series(data, index=df_songs.columns), ignore_index = True)
         if DEBUG : sys.stdout.flush()
 
         # close current file
@@ -110,5 +108,11 @@ if DEBUG : print(f"-- sys.getsizeof(df_songs) [size in bytes]: {sys.getsizeof(df
 # Printing dataframe to csv via the save_df.py method, unless larger than 100mb; if we get a hellabig frame, we ought to split it up. 
 if sys.getsizeof(df_songs) < (100000000): save(df_songs, 'songs_df.csv')
 
-# One option to handle passing dataframes to different location
-clean_columns(df_songs, DEBUG)
+# Separate file to facilitate simultaneous working/editing
+df_songs = clean_columns(df_songs, DEBUG)
+
+# Save again once cleaned, just because
+if sys.getsizeof(df_songs) < (100000000): save(df_songs, 'cleaned_songs_df.csv')
+
+# Running analysis!
+graph(df_songs)

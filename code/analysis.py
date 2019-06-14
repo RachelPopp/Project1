@@ -15,5 +15,7 @@ def clean_columns(df_songs, DEBUG):
         # for x in df_songs.iloc[0] : print(f"-- data: {x}\n-- is type: {type(x)}\n")
         print(f"-- first row of data is:\n{df_songs_type}")
 
+    return (df_songs)
 
-                #TEST
+def graph(df_songs):
+    pass
