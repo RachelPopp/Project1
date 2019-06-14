@@ -103,10 +103,11 @@ for subdir, dirs, files in os.walk(os.path.join('..','MillionSongSubset','data')
 print()
 
 # Just checking how big the filesize gets
-if DEBUG : print(f"-- sys.getsizeof(df_songs) [size in bytes]: {sys.getsizeof(df_songs)}")
+filesize = sys.getsizeof(df_songs)
+if DEBUG : print(f"-- sys.getsizeof(df_songs) [size in bytes]: {filesize} (= {filesize/1000000:.3f} mb)")
 
 # Printing dataframe to csv via the save_df.py method, unless larger than 100mb; if we get a hellabig frame, we ought to split it up. 
-if sys.getsizeof(df_songs) < (100000000): save(df_songs, 'songs_df.csv')
+if filesize < (100000000): save(df_songs, 'songs_df.csv')
 
 # Separate file to facilitate simultaneous working/editing
 df_songs = clean_columns(df_songs, DEBUG)
