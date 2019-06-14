@@ -11,15 +11,14 @@ import hdf5_getters as hg
 # code to save our dataframe to csv
 from save_df import save
 
-import analysis
+from analysis import *
 
 # the above steps take a little while, so whether debug or not, print
 print("Done importing")
-print("Rachel's Check")
 
 # Debug section; either True or False (1 or 0)
-DEBUG = False
-test_length = 10
+DEBUG = True
+test_length = 100000
 if DEBUG : print(f'-- DEBUG MODE ON')
 
 # -----------------------------------
@@ -46,7 +45,6 @@ hg_methods_dict = {
 file_no = 0
 # dynamically generate df_songs column from keys in hg_methods_dict
 df_songs = pd.DataFrame(columns = [x for x in hg_methods_dict])
-print(df_songs)
 
 if DEBUG : print(f"-- target directory: {os.path.join('..','MillionSongSubset','data')}")
 
@@ -54,9 +52,8 @@ if DEBUG : print(f"-- target directory: {os.path.join('..','MillionSongSubset','
 for subdir, dirs, files in os.walk(os.path.join('..','MillionSongSubset','data')):
     for file in files:
 
-        # Note, this "progress bar" will only work if there's no other print statements in the loop! Comment both lines out if you want to debug in the middle of the loop
-        sys.stdout.write(f"\rWorking on file no: {file_no}")
-        sys.stdout.flush()
+        # Note, this "progress bar" will only work if there's no other print statements in the loop! Use sys.stdout.write instead of print to avoid newlines, if you want output in main loop
+        sys.stdout.write(f"\x1b[2K\rWorking on file no: {file_no:4d}")
 
         # if DEBUG : print(f"-- file: {file}")
         
@@ -64,6 +61,7 @@ for subdir, dirs, files in os.walk(os.path.join('..','MillionSongSubset','data')
         hfile = hg.open_h5_file_read(os.path.join(subdir, file))
 
         data = []
+        unicode_valid = True
 
         # loop thru the list of methods we want data of, established earlier.
         # Our 10k song data contains no files with multiple songs, but full might not(!)
@@ -73,17 +71,26 @@ for subdir, dirs, files in os.walk(os.path.join('..','MillionSongSubset','data')
             # get datum for this particular method
             datum = hg_method(hfile)
 
-            # checking if datum is in the default "b'stringything'" format of np.bytes_, and converting back to str. Will likely be other data filtering needed later
+            # checking if datum is tyoe np.bytes_, and converting back to str
+            # certain systems cannot save or print the unencoded info; attempts to print to confirm saving is possibe.
             if isinstance(datum, np.bytes_):
-                # I'm getting unicode errors on this one, see unicode_save_issue.py
-                # if file_no == 471 : print(datum)
-                datum = datum.decode('UTF-8')
+                try:
+                    datum = datum.decode('UTF-8')
+                    # note sys.stdout won't actually get printed here due to buffering; sys.stdout.flush after the hg_method loop will display the whole thing
+                    sys.stdout.write(f" : {datum}")
+                # if .write gets a unicode error, take a look. If you're on a system that can handle unicode issues, comment out the unicode_valid = False line!
+                except UnicodeEncodeError:
+                    datum = datum.encode('UTF-8')
+                    if DEBUG : print(f" : ENCODING ERROR! {datum}")
+                    else : sys.stdout.write(f" : {datum}")
+                    unicode_valid = False
 
             # append datum to working list, which will soon become a row in df_songs
             data.append(datum)
-
-        # once all methods finished, append row to dataframe 
-        df_songs = df_songs.append(pd.Series(data, index=df_songs.columns), ignore_index=True)
+        
+        # once all methods finished IF UNICODE IS VALID, append row to dataframe, and print if debug show what was appended
+        if unicode_valid : df_songs = df_songs.append(pd.Series(data, index=df_songs.columns), ignore_index=True)
+        if DEBUG : sys.stdout.flush()
 
         # close current file
         hfile.close()
@@ -101,7 +108,7 @@ print()
 if DEBUG : print(f"-- sys.getsizeof(df_songs) [size in bytes]: {sys.getsizeof(df_songs)}")
 
 # Printing dataframe to csv via the save_df.py method, unless larger than 100mb; if we get a hellabig frame, we ought to split it up. 
-if sys.getsizeof(df_songs) < (100000000): save(df_songs)
+if sys.getsizeof(df_songs) < (100000000): save(df_songs, 'songs_df.csv')
 
 # One option to handle passing dataframes to different location
-analysis.clean_columns(df_songs, DEBUG)
+clean_columns(df_songs, DEBUG)
