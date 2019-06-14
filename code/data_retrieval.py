@@ -113,7 +113,7 @@ if filesize < (100000000): save(df_songs, 'songs_df.csv')
 df_songs = clean_columns(df_songs, DEBUG)
 
 # Save again once cleaned, just because
-if sys.getsizeof(df_songs) < (100000000): save(df_songs, 'cleaned_songs_df.csv')
+if filesize < (100000000): save(df_songs, 'cleaned_songs_df.csv')
 
 # Running analysis!
 graph(df_songs)
